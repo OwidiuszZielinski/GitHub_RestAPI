@@ -1,18 +1,17 @@
-package owi.example.github_restAPI.repository;
+package owi.example.github_restAPI.app;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import owi.example.github_restAPI.repository.RepositoryDTO;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/")
-public class ReposController {
+public class AppController {
 
-    private final RepositoryService repositoryService;
+    private final AppService appService;
 
 //    @ExceptionHandler({ IllegalArgumentException.class, NotFoundException.class })
 //    public ResponseEntity<ErrorResponse> handleException(RuntimeException ex) {
@@ -20,8 +19,8 @@ public class ReposController {
 //    }
 
     @GetMapping(path = "/{gitHubLogin}")
-    public ResponseEntity<List<RepositoryDTO>> getRepositoriesByLogin(@PathVariable String gitHubLogin){
-        return repositoryService.getRepositoriesByLogin(gitHubLogin);
+    public List<RepositoryDTO> getRepositoriesByLogin(@PathVariable String gitHubLogin){
+        return appService.getRepositoriesByLogin(gitHubLogin);
     }
 
 }

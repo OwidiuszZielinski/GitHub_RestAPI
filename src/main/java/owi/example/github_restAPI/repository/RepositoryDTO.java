@@ -1,56 +1,57 @@
 package owi.example.github_restAPI.repository;
 
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ResponseBody;
+import lombok.*;
 import org.springframework.web.client.RestTemplate;
 import owi.example.github_restAPI.branch.Branch;
+import owi.example.github_restAPI.owner.Owner;
 
-import java.io.IOException;
-import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @ToString
+@Data
+@Builder
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class RepositoryDTO {
     private String name;
-    private String owner;
     private boolean fork;
-    private Set<Branch> branches;
+    private Owner owner;
+    private Branch[] branches;
 
 
-    public static RepositoryDTO fromApiGitHub(String gitHubLogin) {
-
+    private static List<GitRepository> setRepos(String gitHubLogin) {
         String resourceUrl = "https://api.github.com/users/" + gitHubLogin +"/repos";
         RestTemplate restTemplate = new RestTemplate();
-        Repository[] response = restTemplate.getForObject(resourceUrl,Repository[].class);
-        for(Repository x : Objects.requireNonNull(response)){
-            System.out.println(x.getName());
-            System.out.println(x.getUrl());
+        GitRepository[] response = restTemplate.getForObject(resourceUrl, GitRepository[].class);
+        return setBranches(response);
+    }
+    private static List<GitRepository> setBranches(GitRepository[] response){
+        List<GitRepository> repositories = Arrays.stream(Objects.requireNonNull(response))
+                .filter(e -> !e.isFork()).toList();
+        for(GitRepository repo : repositories){
+            String resourceUrl = repo.getUrl() + "/branches";
+            RestTemplate restTemplate = new RestTemplate();
+            Branch[] branches = restTemplate.getForObject(resourceUrl,Branch[].class);
+            repo.setBranches(branches);
 
         }
+        return repositories;
+    }
 
-        return null;
+    public static RepositoryDTO from(GitRepository repository){
+        return RepositoryDTO.builder().name(repository.getName())
+                .fork(repository.isFork())
+                .owner(repository.getOwner())
+                .branches(repository.getBranches())
+                .build();
     }
 
 
+    public static List<RepositoryDTO> fromApiGitHub(String gitHubLogin) {
+        List<GitRepository> repositories = setRepos(gitHubLogin);
+        return repositories.stream().map(RepositoryDTO::from).toList();
+    }
 }

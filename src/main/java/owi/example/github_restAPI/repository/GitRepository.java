@@ -13,3 +13,4 @@ public class GitRepository {
     private Branch[] branches;
 
 }
+

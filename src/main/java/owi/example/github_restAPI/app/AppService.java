@@ -1,6 +1,5 @@
 package owi.example.github_restAPI.app;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -8,6 +7,7 @@ import owi.example.github_restAPI.branch.Branch;
 import owi.example.github_restAPI.exceptions.GitHubUserNotExisting;
 import owi.example.github_restAPI.repository.GitRepository;
 import owi.example.github_restAPI.repository.RepositoryDTO;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -21,7 +21,6 @@ public class AppService {
     public AppService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
-
 
 
     public List<RepositoryDTO> getRepositoriesByLogin(String gitHubLogin) {
@@ -41,6 +40,8 @@ public class AppService {
         return setBranchesInRepositories(gitRepositories);
 
     }
+
+
     private List<GitRepository> setBranchesInRepositories(GitRepository[] gitRepositories) {
         List<GitRepository> repositories = checkFork(gitRepositories);
 
@@ -57,4 +58,5 @@ public class AppService {
         return Arrays.stream(Objects.requireNonNull(gitRepositories))
                 .filter(e -> !e.isFork()).toList();
     }
+
 }

@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import owi.example.github_restAPI.branch.Branch;
 import owi.example.github_restAPI.owner.Owner;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -15,7 +17,7 @@ public class RepositoryDTO {
     private String name;
     private boolean fork;
     private Owner owner;
-    private Branch[] branches;
+    private List<Branch> branches;
 
 
     public static RepositoryDTO from(GitRepository repository) {
@@ -26,7 +28,7 @@ public class RepositoryDTO {
                 .build();
     }
 
-    public static List<RepositoryDTO> fromApiGitHub(List<GitRepository> repositories) {
-        return repositories.stream().map(RepositoryDTO::from).toList();
+    public static Flux<RepositoryDTO> fromApiGitHub(Flux<GitRepository> repositories) {
+        return repositories.map(RepositoryDTO::from);
     }
 }

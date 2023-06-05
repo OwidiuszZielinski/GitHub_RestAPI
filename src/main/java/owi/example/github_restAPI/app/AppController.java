@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import owi.example.github_restAPI.exceptions.ExceptionResponse;
 import owi.example.github_restAPI.exceptions.GitHubUserNotExisting;
+import owi.example.github_restAPI.repository.GitRepository;
 import owi.example.github_restAPI.repository.RepositoryDTO;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -25,7 +27,7 @@ public class AppController {
 
 
     @GetMapping(path = "{gitHubLogin}", produces = "application/json")
-    public List<RepositoryDTO> getRepositoriesByLogin(@PathVariable String gitHubLogin, @RequestHeader HttpHeaders headers) {
+    public Flux<RepositoryDTO> getRepositoriesByLogin(@PathVariable String gitHubLogin, @RequestHeader HttpHeaders headers) {
         return appService.getRepositoriesByLogin(gitHubLogin);
 
     }
